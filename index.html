@@ -1202,88 +1202,130 @@ function setupEventButtons() {
         renderNotifications();
         updateNotificationCount();
         
-        // Reproducir sonido si está habilitado
-        if (settings.notificationSound) {
-            const sound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3');
-            sound.volume = 0.3;
-            sound.play();
-        }
-    }
-    
-    // Disparar alarma
-   // Variable global para el audio
-let alarmAudio = null;
+        // Variable global para el sonido de notificación
+let notificationSound = null;
 
-function initializeAlarmAudio() {
-    // Crear el elemento de audio (compatible con móviles)
-    alarmAudio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
-    alarmAudio.load(); // Precargar el audio
+// Inicializar el sistema de sonidos al cargar la aplicación
+function initializeSounds() {
+    // Precargar el sonido de notificación
+    notificationSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3');
+    notificationSound.load();
+    
+    // Configurar como preload="auto" para mejor compatibilidad
+    notificationSound.preload = 'auto';
 }
 
-async function triggerAlarm(event) {
-    if (!settings.alarmsEnabled) return;
+// Función mejorada para reproducir sonidos en móviles
+async function playNotificationSound() {
+    if (!settings.notificationSound) return;
     
     try {
-        // Mostrar overlay de alarma con fecha correcta
-        document.getElementById('alarm-title').textContent = `¡ALARMA! ${event.name}`;
-        document.getElementById('alarm-message').textContent = 
-            `Es hora de tu evento: ${event.name}\n${formatLocalDate(event.date)} a las ${event.time}`;
-        document.getElementById('alarm-overlay').style.display = 'flex';
+        // Reiniciar el sonido si ya se estaba reproduciendo
+        notificationSound.currentTime = 0;
+        notificationSound.volume = settings.notificationVolume || 0.3;
         
-        // Inicializar audio si no existe
-        if (!alarmAudio) {
-            initializeAlarmAudio();
-        }
-        
-        // Configuración para móviles
-        alarmAudio.volume = settings.alarmVolume / 100;
-        alarmAudio.loop = true;
-        
-        // Reproducir sonido (con manejo de promesa para móviles)
-        const playPromise = alarmAudio.play();
+        // Intentar reproducir (con manejo de promesa)
+        const playPromise = notificationSound.play();
         
         if (playPromise !== undefined) {
             await playPromise.catch(error => {
-                console.error('Error al reproducir alarma:', error);
-                // Mostrar notificación alternativa en caso de error
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification(`Alarma: ${event.name}`, {
-                        body: `Es hora de tu evento: ${formatLocalDate(event.date)} a las ${event.time}`,
-                        icon: '/icon.png'
-                    });
-                }
+                console.log('Reproducción bloqueada:', error);
+                // Mostrar un botón para permitir la reproducción
+                showSoundPermissionRequest();
             });
         }
     } catch (error) {
-        console.error('Error en triggerAlarm:', error);
-        // Fallback para dispositivos que bloquean audio automático
-        showAlert(`¡ALARMA! Es hora de: ${event.name}`, 'warning');
+        console.error('Error al reproducir sonido:', error);
+        // Fallback para dispositivos que bloquean audio
+        vibrateDevice(); // Alternativa con vibración
     }
 }
 
-// Llamar a esta función al iniciar la aplicación
-function setupAlarmSystem() {
-    initializeAlarmAudio();
+// Función para solicitar permiso de sonido (necesario en algunos móviles)
+function showSoundPermissionRequest() {
+    const permissionDiv = document.createElement('div');
+    permissionDiv.className = 'sound-permission-request';
+    permissionDiv.innerHTML = `
+        <p>Para escuchar notificaciones, por favor haz clic en este botón:</p>
+        <button id="enable-sound">Activar Sonidos</button>
+    `;
+    document.body.appendChild(permissionDiv);
     
-    // Solicitar permisos en móviles (necesario para algunos navegadores)
+    document.getElementById('enable-sound').addEventListener('click', async () => {
+        try {
+            await notificationSound.play();
+            permissionDiv.remove();
+        } catch (error) {
+            console.log('El usuario aún no ha permitido sonidos');
+        }
+    });
+}
+
+// Alternativa con vibración para móviles
+function vibrateDevice() {
+    if ('vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200]); // Vibración corta-larga-corta
+    }
+}
+
+// Estilos para la solicitud de permiso
+const soundPermissionStyles = `
+<style>
+    .sound-permission-request {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+        max-width: 90%;
+        text-align: center;
+    }
+    
+    #enable-sound {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+</style>
+`;
+
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    // Agregar estilos
+    document.head.insertAdjacentHTML('beforeend', soundPermissionStyles);
+    
+    // Inicializar sonidos
+    initializeSounds();
+    
+    // Solicitar permisos de notificación (mejor experiencia en móviles)
     if ('Notification' in window) {
         Notification.requestPermission();
     }
-    
-    // Configurar botón para detener alarma
-    document.getElementById('stop-alarm').addEventListener('click', stopAlarm);
-}
-
-function stopAlarm() {
-    if (alarmAudio) {
-        alarmAudio.pause();
-        alarmAudio.currentTime = 0;
+});
     }
-    document.getElementById('alarm-overlay').style.display = 'none';
+    
+    // Disparar alarma
+    function triggerAlarm(event) {
+    if (!settings.alarmsEnabled) return;
+    
+    // Mostrar overlay de alarma con fecha correcta
+    document.getElementById('alarm-title').textContent = `¡ALARMA! ${event.name}`;
+    document.getElementById('alarm-message').textContent = 
+        `Es hora de tu evento: ${event.name}\n${formatLocalDate(event.date)} a las ${event.time}`;
+    document.getElementById('alarm-overlay').style.display = 'flex';
+    
+    // Reproducir sonido de alarma
+    alarmAudio.loop = true;
+    alarmAudio.play();
 }
-
-// Inicializar al cargar la aplicación
-document.addEventListener('DOMContentLoaded', setupAlarmSystem);
 
 // Función para formatear fecha en zona horaria local (corregida)
 function formatLocalDate(dateString) {
