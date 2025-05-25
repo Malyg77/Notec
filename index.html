@@ -506,20 +506,20 @@
         
         /* Alarma */
         .alarm-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            flex-direction: column;
-            color: white;
-            text-align: center;
-            animation: pulseBackground 1s infinite;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.8);
+        display: none; /* Inicialmente oculto */
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Valor muy alto para asegurar que esté por encima */
+        flex-direction: column;
+        color: red;
+        text-align: center;
+        animation: pulseBackground 1s infinite;
         }
         
         .alarm-content {
@@ -860,7 +860,7 @@
     <div class="alarm-content">
         <h2 id="alarm-title">¡ALARMA!</h2>
         <p id="alarm-message">Es hora de tu evento</p>
-        <button id="stop-alarm" style="margin-top: 20px; background-color: white; color: var(--danger-color);">
+        <button id="stop-alarm" style="margin-top: 20px; background-color: red; color: var(--danger-color);">
             <i class="fas fa-check"></i> Aceptar
         </button>
     </div>
@@ -1654,51 +1654,49 @@
             state.reminderTimeouts.push(timeoutId);
         },
         triggerAlarm: (event) => {
-            if (!state.settings.alarmsEnabled) return;
-            
-            document.getElementById('alarm-title').textContent = `¡ALARMA: ${event.name}!`;
-            document.getElementById('alarm-message').textContent = `Es hora de tu evento: ${event.name}\n${utils.formatDate(event.date)} a las ${event.time}`;
-            document.getElementById('alarm-overlay').style.display = 'flex';
-            
-            if (state.settings.notificationSound && state.alarmAudio) {
-                state.alarmAudio.currentTime = 0;
-                state.alarmAudio.play().catch(console.error);
-            }
-            
-            notifications.create({
-                title: `Recordatorio: ${event.name}`,
-                message: `Es hora de tu evento programado para ${event.time}`,
-                type: 'alarm',
-                timestamp: new Date().toISOString()
-            });
-        },
-        checkForUpcoming: () => {
-            if (!state.settings.notificationsEnabled) return;
-            
-            const now = new Date();
-            const in15Minutes = new Date(now.getTime() + 15 * 60 * 1000);
-            
-            state.events.forEach(event => {
-                const eventDate = new Date(`${event.date}T${event.time}`);
-                
-                if (eventDate > now && eventDate <= in15Minutes) {
-                    const alreadyNotified = state.notifications.some(n => 
-                        n.title.includes(event.name) && 
-                        new Date(n.timestamp) > new Date(now.getTime() - 15 * 60 * 1000)
-                    );
-                    
-                    if (!alreadyNotified) {
-                        notifications.create({
-                            title: `Evento próximo: ${event.name}`,
-                            message: `Tu evento "${event.name}" comienza a las ${event.time}`,
-                            type: 'reminder',
-                            timestamp: new Date().toISOString()
-                        });
-                    }
-                }
+    console.log("Ejecutando triggerAlarm para:", event.name); // Debug
+    if (!state.settings.alarmsEnabled) {
+        console.log("Alarmas desactivadas en configuración");
+        return;
+    }
+
+    const overlay = document.getElementById('alarm-overlay');
+    if (!overlay) {
+        console.error("No se encontró el elemento alarm-overlay");
+        return;
+    }
+
+    // Actualizar contenido
+    const titleElement = document.getElementById('alarm-title');
+    const messageElement = document.getElementById('alarm-message');
+    
+    if (titleElement && messageElement) {
+        titleElement.textContent = `¡ALARMA: ${event.name}!`;
+        messageElement.textContent = `Es hora de tu evento: ${event.name}\n${utils.formatDate(event.date)} a las ${event.time}`;
+        
+        // Mostrar overlay
+        overlay.style.display = 'flex';
+        console.log("Alarma visual mostrada"); // Debug
+        
+        // Sonido
+        if (state.settings.notificationSound && state.alarmAudio) {
+            state.alarmAudio.currentTime = 0;
+            state.alarmAudio.play().catch(error => {
+                console.error("Error al reproducir sonido:", error);
             });
         }
-    };
+        
+        // Notificación
+        notifications.create({
+            title: `Recordatorio: ${event.name}`,
+            message: `Es hora de tu evento programado para ${event.time}`,
+            type: 'alarm',
+            timestamp: new Date().toISOString()
+        });
+    } else {
+        console.error("Elementos de título o mensaje no encontrados");
+    }
+}}
 
     // Funciones de categorías
     const categories = {
