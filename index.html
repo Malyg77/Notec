@@ -1653,25 +1653,35 @@
             
             state.reminderTimeouts.push(timeoutId);
         },
-        triggerAlarm: (event) => {
-            if (!state.settings.alarmsEnabled) return;
-            
-            document.getElementById('alarm-title').textContent = `¡ALARMA: ${event.name}!`;
-            document.getElementById('alarm-message').textContent = `Es hora de tu evento: ${event.name}\n${utils.formatDate(event.date)} a las ${event.time}`;
-            document.getElementById('alarm-overlay').style.display = 'flex';
-            
-            if (state.settings.notificationSound && state.alarmAudio) {
-                state.alarmAudio.currentTime = 0;
-                state.alarmAudio.play().catch(console.error);
-            }
-            
-            notifications.create({
-                title: `Recordatorio: ${event.name}`,
-                message: `Es hora de tu evento programado para ${event.time}`,
-                type: 'alarm',
-                timestamp: new Date().toISOString()
-            });
-        },
+       triggerAlarm: (event) => {
+    console.log("Disparando alarma para evento:", event.name); // Debug
+    if (!state.settings.alarmsEnabled) return;
+    
+    document.getElementById('alarm-title').textContent = `¡ALARMA: ${event.name}!`;
+    document.getElementById('alarm-message').textContent = 
+        `Es hora de tu evento: ${event.name}\n${utils.formatDate(event.date)} a las ${event.time}`;
+    
+    // Mostrar el overlay
+    const overlay = document.getElementById('alarm-overlay');
+    overlay.style.display = 'flex';
+    console.log("Overlay debería estar visible ahora"); // Debug
+    
+    // Sonido
+    if (state.settings.notificationSound && state.alarmAudio) {
+        state.alarmAudio.currentTime = 0;
+        state.alarmAudio.play().catch(error => {
+            console.error("Error al reproducir sonido:", error);
+        });
+    }
+    
+    // Notificación
+    notifications.create({
+        title: `Recordatorio: ${event.name}`,
+        message: `Es hora de tu evento programado para ${event.time}`,
+        type: 'alarm',
+        timestamp: new Date().toISOString()
+    });
+}
         checkForUpcoming: () => {
             if (!state.settings.notificationsEnabled) return;
             
