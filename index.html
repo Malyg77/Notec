@@ -306,79 +306,6 @@
             background-color: var(--sidebar-bg);
             transition: background-color 0.3s;
         }
-
-        /* Styles for the switch (toggle) */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--gray-color);
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary-color);
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px var(--primary-color);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(16px);
-        }
-
-        .settings-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .settings-row:last-child {
-            border-bottom: none;
-        }
-        .settings-group {
-            margin-bottom: 30px;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: var(--sidebar-bg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-        .settings-group h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
         
         /* Alarma */
         .alarm-overlay {
@@ -528,7 +455,6 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             transition: background-color 0.3s;
-            cursor: pointer;
         }
         
         .calendar-day:hover {
@@ -542,7 +468,6 @@
         
         .calendar-day.today {
             background-color: rgba(66, 133, 244, 0.2);
-            border-color: var(--primary-color);
         }
         
         .calendar-day.has-event {
@@ -609,6 +534,7 @@
         </div>
         
         <div class="main-content">
+            <!-- Vista de Inicio/Dashboard -->
             <div id="dashboard-view" class="view active">
                 <div class="card stat-card">
                     <h3>Eventos</h3>
@@ -620,7 +546,8 @@
                 <div class="card">
                     <h3>Calendario Semanal</h3>
                     <div class="week-calendar" id="week-calendar">
-                        </div>
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </div>
                 </div>
                 
                 <div class="card stat-card">
@@ -635,6 +562,7 @@
                 </div>
             </div>
             
+            <!-- Vista de Eventos -->
             <div id="events-view" class="view">
                 <div class="card">
                     <h2>Mis Eventos</h2>
@@ -642,6 +570,7 @@
                 </div>
             </div>
             
+            <!-- Vista de Crear Evento -->
             <div id="create-event-view" class="view">
                 <div class="card event-form">
                     <h2>Crear Nuevo Evento</h2>
@@ -664,7 +593,8 @@
                     <div class="form-group">
                         <label>Categoría</label>
                         <div id="category-select-container">
-                            </div>
+                            <!-- Se llenará dinámicamente con JavaScript -->
+                        </div>
                         <button id="add-category-btn" class="add-category-btn" style="margin-top: 10px;">
                             <i class="fas fa-plus"></i> Agregar nueva categoría
                         </button>
@@ -684,6 +614,7 @@
                 </div>
             </div>
             
+            <!-- Vista de Calendario -->
             <div id="calendar-view" class="view">
                 <div class="card">
                     <div class="calendar-header">
@@ -695,19 +626,23 @@
                         </div>
                     </div>
                     <div class="calendar-grid" id="calendar-grid">
-                        </div>
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </div>
                 </div>
             </div>
             
+            <!-- Vista de Categorías -->
             <div id="categories-view" class="view">
                 <div class="card">
                     <h2>Categorías</h2>
                     <div class="categories-list" id="categories-list">
-                        </div>
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </div>
                     <button id="add-category" style="margin-top: 20px;"><i class="fas fa-plus"></i> Agregar Categoría</button>
                 </div>
             </div>
             
+            <!-- Vista de Notificaciones -->
             <div id="notifications-view" class="view">
                 <div class="card">
                     <h2>Notificaciones</h2>
@@ -715,6 +650,7 @@
                 </div>
             </div>
             
+            <!-- Vista de Configuración -->
             <div id="settings-view" class="view">
                 <div class="card">
                     <h2>Configuración</h2>
@@ -771,6 +707,7 @@
     </div>
 </div>
 
+<!-- Overlay de alarma -->
 <div id="alarm-overlay" class="alarm-overlay" style="display: none;">
     <div class="alarm-content">
         <h2 id="alarm-title">¡ALARMA!</h2>
@@ -781,6 +718,7 @@
     </div>
 </div>
 
+<!-- Modal para agregar categoría -->
 <div id="category-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <h2>Agregar Nueva Categoría</h2>
@@ -949,10 +887,6 @@
         const savedEvents = localStorage.getItem('notec-events');
         if (savedEvents) {
             events = JSON.parse(savedEvents);
-            // Convertir de nuevo las fechas a objetos Date si se guardaron como cadenas
-            events.forEach(event => {
-                event.dateTime = new Date(event.dateTime);
-            });
             renderEvents();
             scheduleAllReminders();
         }
@@ -960,12 +894,7 @@
     
     // Guardar eventos en localStorage
     function saveEvents() {
-        // Almacenar las fechas como cadenas ISO para que localStorage pueda manejarlas
-        const eventsToSave = events.map(event => ({
-            ...event,
-            dateTime: event.dateTime.toISOString()
-        }));
-        localStorage.setItem('notec-events', JSON.stringify(eventsToSave));
+        localStorage.setItem('notec-events', JSON.stringify(events));
         updateEventCount();
         renderCalendar();
         renderWeekCalendar();
@@ -994,10 +923,6 @@
                     renderCategories();
                 } else if (viewId === 'create-event-view') {
                     renderCategorySelect();
-                } else if (viewId === 'events-view') {
-                    renderEvents();
-                } else if (viewId === 'notifications-view') {
-                    renderNotifications();
                 }
             });
         });
@@ -1023,721 +948,839 @@
         // Botón para agregar categoría
         document.getElementById('add-category-btn').addEventListener('click', () => {
             document.getElementById('category-modal').style.display = 'flex';
-            document.getElementById('new-category-name').value = '';
-            document.getElementById('new-category-color').value = '#4285f4';
-            document.getElementById('new-category-icon').value = 'briefcase';
         });
     }
-
-    // Funciones para el CRUD de eventos
+    
+    // Guardar evento
     function saveEvent() {
-        const name = document.getElementById('event-name').value;
-        const date = document.getElementById('event-date').value;
-        const time = document.getElementById('event-time').value;
-        const description = document.getElementById('event-description').value;
-        const reminder = parseInt(document.getElementById('event-reminder').value);
-
-        if (!name || !date || !time || selectedCategoryId === null) {
-            alert('Por favor, completa todos los campos obligatorios y selecciona una categoría.');
+        const eventName = document.getElementById('event-name').value.trim();
+        const eventDate = document.getElementById('event-date').value;
+        const eventTime = document.getElementById('event-time').value;
+        const eventDescription = document.getElementById('event-description').value.trim();
+        const eventReminder = parseInt(document.getElementById('event-reminder').value);
+        
+        // Validar campos obligatorios
+        if (!eventName || !eventDate || !eventTime || !selectedCategoryId) {
+            alert('Por favor completa todos los campos obligatorios');
             return;
         }
-
-        const dateTime = new Date(`${date}T${time}:00`);
-
+        
+        // Obtener la categoría seleccionada
+        const selectedCategory = categories.find(cat => cat.id === selectedCategoryId);
+        if (!selectedCategory) {
+            alert('Por favor selecciona una categoría válida');
+            return;
+        }
+        
+        // Validar que la fecha/hora no sea en el pasado
+        const eventDateTime = new Date(`${eventDate}T${eventTime}`);
+        const now = new Date();
+        
+        if (eventDateTime < now) {
+            alert('No puedes crear eventos en el pasado. Por favor selecciona una fecha y hora futuras.');
+            return;
+        }
+        
+        // Crear el nuevo evento
         const newEvent = {
             id: Date.now(),
-            name,
-            dateTime,
-            description,
-            categoryId: selectedCategoryId,
-            reminder
+            name: eventName,
+            date: eventDate,
+            time: eventTime,
+            description: eventDescription,
+            category: selectedCategory.name.toLowerCase(),
+            categoryId: selectedCategory.id,
+            reminder: eventReminder,
+            createdAt: new Date().toISOString()
         };
-
+        
+        // Guardar el evento
         events.push(newEvent);
         saveEvents();
         scheduleReminder(newEvent);
-        alert('Evento guardado correctamente!');
-        clearEventForm();
-        renderEvents(); // Refresh the events list
-        document.querySelector('.menu-item[data-view="events"]').click(); // Go to events view
-    }
-
-    function clearEventForm() {
+        
+        // Limpiar el formulario
         document.getElementById('event-name').value = '';
         document.getElementById('event-description').value = '';
-        const today = new Date();
-        const todayFormatted = today.toISOString().split('T')[0];
-        document.getElementById('event-date').value = todayFormatted;
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        document.getElementById('event-time').value = `${hours}:${minutes}`;
         selectedCategoryId = null;
         renderCategorySelect();
+        
+        // Mostrar mensaje de éxito
+        alert(`Evento "${eventName}" creado exitosamente`);
+        
+        // Volver al dashboard
+        document.querySelector('[data-view="dashboard"]').click();
     }
-
+    
+    // Renderizar selector de categorías
+    function renderCategorySelect() {
+        const container = document.getElementById('category-select-container');
+        container.innerHTML = '';
+        
+        const categorySelect = document.createElement('div');
+        categorySelect.className = 'category-select';
+        
+        categories.forEach(category => {
+            const option = document.createElement('div');
+            option.className = `category-option ${selectedCategoryId === category.id ? 'selected' : ''}`;
+            option.innerHTML = `
+                <span class="category-color" style="background-color: ${category.color};"></span>
+                ${category.name}
+            `;
+            option.addEventListener('click', () => {
+                selectedCategoryId = category.id;
+                renderCategorySelect();
+            });
+            categorySelect.appendChild(option);
+        });
+        
+        container.appendChild(categorySelect);
+    }
+    
+    // Inicializar modal de categorías
+    function initCategoryModal() {
+        // Botón para agregar categoría desde la vista de categorías
+        document.getElementById('add-category').addEventListener('click', () => {
+            document.getElementById('category-modal').style.display = 'flex';
+        });
+        
+        // Botón para cancelar
+        document.getElementById('cancel-add-category').addEventListener('click', () => {
+            document.getElementById('category-modal').style.display = 'none';
+        });
+        
+        // Botón para confirmar
+        document.getElementById('confirm-add-category').addEventListener('click', () => {
+            const name = document.getElementById('new-category-name').value.trim();
+            const color = document.getElementById('new-category-color').value;
+            const icon = document.getElementById('new-category-icon').value;
+            
+            if (!name) {
+                alert('Por favor ingresa un nombre para la categoría');
+                return;
+            }
+            
+            // Crear la nueva categoría
+            const newCategory = {
+                id: Date.now(),
+                name: name,
+                color: color,
+                icon: icon
+            };
+            
+            categories.push(newCategory);
+            saveCategories();
+            
+            // Limpiar y cerrar modal
+            document.getElementById('new-category-name').value = '';
+            document.getElementById('category-modal').style.display = 'none';
+            
+            // Seleccionar la nueva categoría si estamos en el formulario de evento
+            if (document.getElementById('create-event-view').classList.contains('active')) {
+                selectedCategoryId = newCategory.id;
+                renderCategorySelect();
+            }
+        });
+    }
+    
+    // Renderizar lista de eventos
     function renderEvents() {
         const eventsList = document.getElementById('events-list');
+        const upcomingList = document.getElementById('upcoming-events-list');
+        
         eventsList.innerHTML = '';
-
+        upcomingList.innerHTML = '';
+        
         if (events.length === 0) {
-            eventsList.innerHTML = '<p>No hay eventos registrados.</p>';
+            eventsList.innerHTML = '<p>No hay eventos programados</p>';
+                       upcomingList.innerHTML = '<p>No hay eventos próximos</p>';
             return;
         }
 
-        const sortedEvents = [...events].sort((a, b) => a.dateTime - b.dateTime);
+        // Ordenar eventos por fecha (más cercanos primero)
+        const sortedEvents = [...events].sort((a, b) => {
+            return new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`);
+        });
 
+        // Mostrar todos los eventos en la vista de eventos
         sortedEvents.forEach(event => {
-            const category = categories.find(cat => cat.id === event.categoryId);
-            const categoryName = category ? category.name : 'Sin Categoría';
-            const categoryColor = category ? category.color : '#ccc';
-            const eventDate = event.dateTime.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            const eventTime = event.dateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
             const eventItem = document.createElement('div');
-            eventItem.classList.add('event-item');
-            eventItem.style.borderLeftColor = categoryColor;
+            eventItem.className = 'event-item';
+            
+            const category = categories.find(cat => cat.id === event.categoryId) || {};
+            
             eventItem.innerHTML = `
-                <h4>${event.name}</h4>
-                <p><strong>Fecha:</strong> ${eventDate}</p>
-                <p><strong>Hora:</strong> ${eventTime}</p>
-                <p><strong>Categoría:</strong> ${categoryName}</p>
-                <p>${event.description || 'Sin descripción.'}</p>
+                <h3>${event.name}</h3>
+                <p><i class="fas fa-calendar-day"></i> ${formatDate(event.date)} a las ${event.time}</p>
+                ${event.description ? `<p><i class="fas fa-align-left"></i> ${event.description}</p>` : ''}
+                <p><span class="category-color" style="background-color: ${category.color || '#ccc'};"></span> ${category.name || 'Sin categoría'}</p>
                 <div class="event-actions">
-                    <button class="edit-btn" data-id="${event.id}"><i class="fas fa-edit"></i> Editar</button>
-                    <button class="delete-btn" data-id="${event.id}"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                    <button class="edit-btn" data-id="${event.id}"><i class="fas fa-edit"></i></button>
+                    <button class="delete-btn" data-id="${event.id}"><i class="fas fa-trash"></i></button>
                 </div>
             `;
+            
             eventsList.appendChild(eventItem);
         });
 
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const eventId = parseInt(e.target.dataset.id);
+        // Mostrar solo los próximos eventos en el dashboard
+        const now = new Date();
+        const upcomingEvents = sortedEvents.filter(event => {
+            const eventDate = new Date(`${event.date}T${event.time}`);
+            return eventDate > now;
+        }).slice(0, 5); // Mostrar máximo 5 eventos próximos
+
+        if (upcomingEvents.length > 0) {
+            upcomingEvents.forEach(event => {
+                const eventItem = document.createElement('div');
+                eventItem.className = 'event-item';
+                
+                const category = categories.find(cat => cat.id === event.categoryId) || {};
+                const eventDate = new Date(`${event.date}T${event.time}`);
+                const daysLeft = Math.floor((eventDate - now) / (1000 * 60 * 60 * 24));
+                const hoursLeft = Math.floor((eventDate - now) / (1000 * 60 * 60));
+                
+                let timeLeftText = '';
+                if (daysLeft > 0) {
+                    timeLeftText = `en ${daysLeft} ${daysLeft === 1 ? 'día' : 'días'}`;
+                } else if (hoursLeft > 0) {
+                    timeLeftText = `en ${hoursLeft} ${hoursLeft === 1 ? 'hora' : 'horas'}`;
+                } else {
+                    timeLeftText = 'muy pronto';
+                }
+                
+                eventItem.innerHTML = `
+                    <h3>${event.name}</h3>
+                    <p><i class="fas fa-calendar-day"></i> ${formatDate(event.date)} a las ${event.time} (${timeLeftText})</p>
+                    <p><span class="category-color" style="background-color: ${category.color || '#ccc'};"></span> ${category.name || 'Sin categoría'}</p>
+                `;
+                
+                upcomingList.appendChild(eventItem);
+            });
+        } else {
+            upcomingList.innerHTML = '<p>No hay eventos próximos</p>';
+        }
+
+        // Agregar event listeners para los botones de acción
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const eventId = parseInt(this.getAttribute('data-id'));
                 deleteEvent(eventId);
             });
         });
 
-        document.querySelectorAll('.edit-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const eventId = parseInt(e.target.dataset.id);
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const eventId = parseInt(this.getAttribute('data-id'));
                 editEvent(eventId);
             });
         });
     }
 
-    function deleteEvent(id) {
+    // Formatear fecha para mostrar
+    function formatDate(dateString) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-ES', options);
+    }
+
+    // Eliminar evento
+    function deleteEvent(eventId) {
         if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
-            events = events.filter(event => event.id !== id);
+            events = events.filter(event => event.id !== eventId);
             saveEvents();
             renderEvents();
-            cancelReminder(id);
-            addNotification('Evento eliminado', `El evento "${id}" ha sido eliminado.`, 'info'); // Simplified message
         }
     }
 
-    function editEvent(id) {
-        const eventToEdit = events.find(event => event.id === id);
-        if (!eventToEdit) return;
+    // Editar evento
+    function editEvent(eventId) {
+        const event = events.find(e => e.id === eventId);
+        if (!event) return;
 
-        // Populate the form with event details
-        document.getElementById('event-name').value = eventToEdit.name;
-        document.getElementById('event-date').value = eventToEdit.dateTime.toISOString().split('T')[0];
-        document.getElementById('event-time').value = eventToEdit.dateTime.toTimeString().substring(0, 5);
-        document.getElementById('event-description').value = eventToEdit.description;
-        document.getElementById('event-reminder').value = eventToEdit.reminder;
-        selectedCategoryId = eventToEdit.categoryId;
-        renderCategorySelect(); // Update category selection in form
+        // Llenar el formulario con los datos del evento
+        document.getElementById('event-name').value = event.name;
+        document.getElementById('event-date').value = event.date;
+        document.getElementById('event-time').value = event.time;
+        document.getElementById('event-description').value = event.description || '';
+        document.getElementById('event-reminder').value = event.reminder;
+        selectedCategoryId = event.categoryId;
+        renderCategorySelect();
 
-        // Change "Save Event" button to "Update Event"
+        // Cambiar a la vista de creación de evento
+        document.querySelector('[data-view="create-event"]').click();
+
+        // Cambiar el texto del botón a "Actualizar"
         const saveButton = document.getElementById('save-event');
-        saveButton.textContent = 'Actualizar Evento';
-        saveButton.onclick = () => updateEvent(id);
-
-        // Switch to create event view
-        document.querySelector('.menu-item[data-view="create-event"]').click();
+        saveButton.innerHTML = '<i class="fas fa-save"></i> Actualizar Evento';
+        saveButton.onclick = function() {
+            updateEvent(eventId);
+        };
     }
 
-    function updateEvent(id) {
-        const eventIndex = events.findIndex(event => event.id === id);
+    // Actualizar evento
+    function updateEvent(eventId) {
+        const eventIndex = events.findIndex(e => e.id === eventId);
         if (eventIndex === -1) return;
 
-        const name = document.getElementById('event-name').value;
-        const date = document.getElementById('event-date').value;
-        const time = document.getElementById('event-time').value;
-        const description = document.getElementById('event-description').value;
-        const reminder = parseInt(document.getElementById('event-reminder').value);
+        const eventName = document.getElementById('event-name').value.trim();
+        const eventDate = document.getElementById('event-date').value;
+        const eventTime = document.getElementById('event-time').value;
+        const eventDescription = document.getElementById('event-description').value.trim();
+        const eventReminder = parseInt(document.getElementById('event-reminder').value);
 
-        if (!name || !date || !time || selectedCategoryId === null) {
-            alert('Por favor, completa todos los campos obligatorios y selecciona una categoría.');
+        // Validar campos obligatorios
+        if (!eventName || !eventDate || !eventTime || !selectedCategoryId) {
+            alert('Por favor completa todos los campos obligatorios');
             return;
         }
 
-        const dateTime = new Date(`${date}T${time}:00`);
+        // Obtener la categoría seleccionada
+        const selectedCategory = categories.find(cat => cat.id === selectedCategoryId);
+        if (!selectedCategory) {
+            alert('Por favor selecciona una categoría válida');
+            return;
+        }
 
+        // Validar que la fecha/hora no sea en el pasado
+        const eventDateTime = new Date(`${eventDate}T${eventTime}`);
+        const now = new Date();
+        
+        if (eventDateTime < now) {
+            alert('No puedes programar eventos en el pasado. Por favor selecciona una fecha y hora futuras.');
+            return;
+        }
+
+        // Actualizar el evento
         events[eventIndex] = {
-            id,
-            name,
-            dateTime,
-            description,
-            categoryId: selectedCategoryId,
-            reminder
+            ...events[eventIndex],
+            name: eventName,
+            date: eventDate,
+            time: eventTime,
+            description: eventDescription,
+            category: selectedCategory.name.toLowerCase(),
+            categoryId: selectedCategory.id,
+            reminder: eventReminder
         };
+
         saveEvents();
-        scheduleReminder(events[eventIndex]); // Reschedule reminder for updated event
-        alert('Evento actualizado correctamente!');
-        clearEventForm();
-        // Restore "Save Event" button
+        scheduleAllReminders(); // Reagendar todos los recordatorios
+
+        // Limpiar el formulario
+        document.getElementById('event-name').value = '';
+        document.getElementById('event-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('event-time').value = new Date().toTimeString().substring(0, 5);
+        document.getElementById('event-description').value = '';
+        document.getElementById('event-reminder').value = '15';
+        selectedCategoryId = null;
+        renderCategorySelect();
+
+        // Restaurar el botón de guardar
         const saveButton = document.getElementById('save-event');
-        saveButton.textContent = 'Guardar Evento';
+        saveButton.innerHTML = '<i class="fas fa-save"></i> Guardar Evento';
         saveButton.onclick = saveEvent;
-        renderEvents();
-        document.querySelector('.menu-item[data-view="events"]').click();
+
+        // Mostrar mensaje de éxito
+        alert(`Evento "${eventName}" actualizado exitosamente`);
+
+        // Volver a la lista de eventos
+        document.querySelector('[data-view="events"]').click();
     }
 
-    // Funciones para estadísticas y próximos eventos (Dashboard)
-    function updateEventCount() {
-        document.getElementById('total-events').textContent = events.length;
-    }
-
-    function updateNotificationCount() {
-        document.getElementById('total-notifications').textContent = notifications.length;
-    }
-
-    function checkForUpcomingEvents() {
-        const now = new Date();
-        const upcomingEventsList = document.getElementById('upcoming-events-list');
-        upcomingEventsList.innerHTML = '';
-        
-        // Clear existing timeouts
-        reminderTimeouts.forEach(timeout => clearTimeout(timeout));
-        reminderTimeouts = [];
-
-        const sortedEvents = [...events].sort((a, b) => a.dateTime - b.dateTime);
-        let upcomingCount = 0;
-
-        sortedEvents.forEach(event => {
-            const eventTime = new Date(event.dateTime);
-            
-            // Calculate time for reminder
-            const reminderDateTime = new Date(eventTime.getTime() - event.reminder * 60 * 1000);
-
-            // Schedule reminder if it's in the future and settings allow
-            if (settings.alarmsEnabled && reminderDateTime > now) {
-                const timeToReminder = reminderDateTime.getTime() - now.getTime();
-                const timeoutId = setTimeout(() => {
-                    triggerAlarm(event);
-                    addNotification('Alarma de Evento', `¡Tu evento "${event.name}" es en ${event.reminder} minutos!`, 'warning');
-                }, timeToReminder);
-                reminderTimeouts.push(timeoutId);
-            }
-
-            // Display upcoming events on dashboard
-            if (eventTime > now && upcomingCount < 5) { // Show up to 5 upcoming events
-                const category = categories.find(cat => cat.id === event.categoryId);
-                const categoryColor = category ? category.color : '#ccc';
-                const eventDate = eventTime.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric' });
-                const eventTimeFormatted = eventTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-                const eventItem = document.createElement('div');
-                eventItem.classList.add('event-item');
-                eventItem.style.borderLeftColor = categoryColor;
-                eventItem.innerHTML = `
-                    <p style="font-size: 14px; margin-bottom: 5px;">
-                        <i class="fas fa-calendar-alt"></i> ${eventDate} <i class="fas fa-clock" style="margin-left: 10px;"></i> ${eventTimeFormatted}
-                    </p>
-                    <h4 style="margin: 0;">${event.name}</h4>
-                `;
-                upcomingEventsList.appendChild(eventItem);
-                upcomingCount++;
-            }
-        });
-
-        if (upcomingCount === 0) {
-            upcomingEventsList.innerHTML = '<p>No hay próximos eventos.</p>';
-        }
-    }
-
-    function scheduleAllReminders() {
-        // Clear all existing timeouts first
-        reminderTimeouts.forEach(timeout => clearTimeout(timeout));
-        reminderTimeouts = [];
-
-        events.forEach(event => {
-            scheduleReminder(event);
-        });
-    }
-
-    function scheduleReminder(event) {
-        const now = new Date();
-        const eventTime = new Date(event.dateTime);
-        const reminderDateTime = new Date(eventTime.getTime() - event.reminder * 60 * 1000);
-
-        if (settings.alarmsEnabled && reminderDateTime > now) {
-            const timeToReminder = reminderDateTime.getTime() - now.getTime();
-            const timeoutId = setTimeout(() => {
-                triggerAlarm(event);
-                addNotification('Alarma de Evento', `¡Tu evento "${event.name}" es en ${event.reminder} minutos!`, 'warning');
-            }, timeToReminder);
-            reminderTimeouts.push(timeoutId);
-        }
-    }
-
-    function cancelReminder(eventId) {
-        // Find and clear the specific reminder timeout
-        const index = reminderTimeouts.findIndex(timeoutId => {
-            // This is a simplification; a more robust solution would store event.id with timeoutId
-            // For this example, we assume we want to clear all associated timeouts if any.
-            // In a real app, reminderTimeouts would store objects like { eventId: id, timeout: timeoutId }
-            return true; // Placeholder for now
-        });
-        if (index !== -1) {
-            clearTimeout(reminderTimeouts[index]);
-            reminderTimeouts.splice(index, 1);
-        }
-        // Re-schedule all reminders to ensure consistency after deletion/edit
-        scheduleAllReminders(); 
-    }
-
-    function triggerAlarm(event) {
-        if (!settings.alarmsEnabled) return;
-
-        const alarmOverlay = document.getElementById('alarm-overlay');
-        const alarmTitle = document.getElementById('alarm-title');
-        const alarmMessage = document.getElementById('alarm-message');
-
-        alarmTitle.textContent = `¡Alarma: ${event.name}!`;
-        alarmMessage.textContent = event.description || `Es hora de tu evento "${event.name}" programado para ${event.dateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}.`;
-        
-        alarmOverlay.style.display = 'flex';
-
-        if (settings.notificationSound && alarmAudio && soundInitialized) {
-            alarmAudio.currentTime = 0; // Reset audio to start
-            alarmAudio.volume = settings.alarmVolume / 100;
-            alarmAudio.play().catch(e => console.error("Error playing alarm audio:", e));
-        }
-    }
-
-    // Funciones para el calendario (vista completa)
+    // Inicializar calendario
     function initCalendar() {
         document.getElementById('prev-month').addEventListener('click', () => {
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
             renderCalendar();
         });
+
         document.getElementById('next-month').addEventListener('click', () => {
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
             renderCalendar();
         });
+
         document.getElementById('today-btn').addEventListener('click', () => {
             currentCalendarDate = new Date();
             renderCalendar();
         });
+
         renderCalendar();
     }
 
+    // Renderizar calendario mensual
     function renderCalendar() {
-        const monthYearDisplay = document.getElementById('calendar-month-year');
+        const monthYearElement = document.getElementById('calendar-month-year');
         const calendarGrid = document.getElementById('calendar-grid');
-        calendarGrid.innerHTML = ''; // Clear previous days
 
-        const year = currentCalendarDate.getFullYear();
-        const month = currentCalendarDate.getMonth();
-        
-        // Set month and year display
-        monthYearDisplay.textContent = currentCalendarDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+        // Configurar el título del mes y año
+        const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        monthYearElement.textContent = `${monthNames[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
 
-        // Add day headers (Mon, Tue, etc.)
-        const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-        daysOfWeek.forEach(day => {
+        // Limpiar el calendario
+        calendarGrid.innerHTML = '';
+
+        // Agregar encabezados de días
+        const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        dayNames.forEach(day => {
             const dayHeader = document.createElement('div');
-            dayHeader.classList.add('calendar-day-header');
+            dayHeader.className = 'calendar-day-header';
             dayHeader.textContent = day;
             calendarGrid.appendChild(dayHeader);
         });
 
-        // Get first day of the month
-        const firstDayOfMonth = new Date(year, month, 1);
-        const lastDayOfMonth = new Date(year, month + 1, 0);
-        const daysInMonth = lastDayOfMonth.getDate();
+        // Obtener el primer día del mes y el último día del mes
+        const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+        const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
 
-        // Calculate offset for first day of the week (Monday = 0, Sunday = 6)
-        let firstDayOfWeek = firstDayOfMonth.getDay();
-        if (firstDayOfWeek === 0) firstDayOfWeek = 7; // Adjust Sunday from 0 to 7 for Monday-start week
-        const startDayIndex = firstDayOfWeek - 1; 
+        // Obtener el día de la semana del primer día (0 = Domingo, 6 = Sábado)
+        const firstDayOfWeek = firstDay.getDay();
 
-        // Fill leading empty days from previous month
-        for (let i = 0; i < startDayIndex; i++) {
-            const emptyDay = document.createElement('div');
-            emptyDay.classList.add('calendar-day', 'other-month');
-            calendarGrid.appendChild(emptyDay);
+        // Obtener el último día del mes anterior
+        const daysInLastMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 0).getDate();
+
+        // Agregar días del mes anterior (si es necesario)
+        for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day other-month';
+            dayElement.textContent = daysInLastMonth - i;
+            calendarGrid.appendChild(dayElement);
         }
 
-        // Fill days of the current month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month, day);
+        // Agregar días del mes actual
+        const today = new Date();
+        for (let i = 1; i <= lastDay.getDate(); i++) {
             const dayElement = document.createElement('div');
-            dayElement.classList.add('calendar-day');
-            dayElement.innerHTML = `<div class="calendar-day-number">${day}</div>`;
+            dayElement.className = 'calendar-day';
+            dayElement.innerHTML = `<div class="calendar-day-number">${i}</div>`;
 
-            // Check if it's today
-            const today = new Date();
-            if (date.toDateString() === today.toDateString()) {
+            // Verificar si es hoy
+            if (currentCalendarDate.getFullYear() === today.getFullYear() && 
+                currentCalendarDate.getMonth() === today.getMonth() && 
+                i === today.getDate()) {
                 dayElement.classList.add('today');
             }
 
-            // Check for events on this day
-            const eventsOnThisDay = events.filter(event => 
-                event.dateTime.getFullYear() === year &&
-                event.dateTime.getMonth() === month &&
-                event.dateTime.getDate() === day
-            );
+            // Verificar si hay eventos en este día
+            const currentDate = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), i);
+            const dateString = currentDate.toISOString().split('T')[0];
+            const dayEvents = events.filter(event => event.date === dateString);
 
-            if (eventsOnThisDay.length > 0) {
+            if (dayEvents.length > 0) {
                 dayElement.classList.add('has-event');
-                const eventDotsContainer = document.createElement('div');
-                eventDotsContainer.classList.add('event-dots');
-                eventsOnThisDay.forEach(event => {
-                    const category = categories.find(cat => cat.id === event.categoryId);
-                    const dot = document.createElement('span');
-                    dot.classList.add('calendar-event-dot');
-                    dot.style.backgroundColor = category ? category.color : 'gray';
-                    dot.title = event.name; // Show event name on hover
-                    eventDotsContainer.appendChild(dot);
+                dayElement.innerHTML += `<div class="calendar-event-dot"></div>`;
+                
+                // Agregar tooltip con los eventos del día
+                dayElement.title = dayEvents.map(event => event.name).join('\n');
+                
+                // Hacer clic para ver detalles
+                dayElement.style.cursor = 'pointer';
+                dayElement.addEventListener('click', () => {
+                    showDayEvents(dateString);
                 });
-                dayElement.appendChild(eventDotsContainer);
             }
-            
-            // Add click listener to show events for that day
-            dayElement.addEventListener('click', () => showDayEvents(date, eventsOnThisDay));
 
             calendarGrid.appendChild(dayElement);
         }
 
-        // Fill trailing empty days for the next month
-        const totalDaysDisplayed = startDayIndex + daysInMonth;
-        const remainingCells = 42 - totalDaysDisplayed; // Max 6 rows * 7 days = 42 cells
-        for (let i = 0; i < remainingCells; i++) {
-            const emptyDay = document.createElement('div');
-            emptyDay.classList.add('calendar-day', 'other-month');
-            calendarGrid.appendChild(emptyDay);
+        // Calcular días restantes para completar la cuadrícula (42 celdas en total)
+        const totalCells = 42; // 6 filas x 7 columnas
+        const daysAdded = firstDayOfWeek + lastDay.getDate();
+        const daysRemaining = totalCells - daysAdded;
+
+        // Agregar días del próximo mes (si es necesario)
+        for (let i = 1; i <= daysRemaining; i++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day other-month';
+            dayElement.textContent = i;
+            calendarGrid.appendChild(dayElement);
         }
     }
 
-    function showDayEvents(date, eventsOnDay) {
-        // Here you could implement a modal or switch to the events view filtered by this date
-        let message = `Eventos para el ${date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}:\n\n`;
-        if (eventsOnDay.length > 0) {
-            eventsOnDay.forEach(event => {
-                message += `- ${event.name} (${event.dateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })})\n`;
-            });
-        } else {
-            message += 'No hay eventos para este día.';
-        }
-        alert(message); // For simplicity, using alert. A modal would be better.
+    // Mostrar eventos de un día específico
+    function showDayEvents(dateString) {
+        const dayEvents = events.filter(event => event.date === dateString);
+        if (dayEvents.length === 0) return;
+
+        let message = `Eventos para ${formatDate(dateString)}:\n\n`;
+        dayEvents.forEach(event => {
+            message += `• ${event.name} - ${event.time}\n`;
+        });
+
+        alert(message);
     }
 
+    // Inicializar calendario semanal
     function initWeekCalendar() {
         renderWeekCalendar();
     }
 
+    // Renderizar calendario semanal
     function renderWeekCalendar() {
         const weekCalendar = document.getElementById('week-calendar');
         weekCalendar.innerHTML = '';
+
         const today = new Date();
-        const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1))); // Start from Monday
+        const currentDay = today.getDay(); // 0 (Domingo) a 6 (Sábado)
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - currentDay); // Ir al domingo de esta semana
+
+        const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
         for (let i = 0; i < 7; i++) {
-            const currentDay = new Date(startOfWeek);
-            currentDay.setDate(startOfWeek.getDate() + i);
-
+            const day = new Date(startDate);
+            day.setDate(startDate.getDate() + i);
+            
             const dayElement = document.createElement('div');
-            dayElement.classList.add('day');
-            if (currentDay.toDateString() === new Date().toDateString()) {
-                dayElement.style.backgroundColor = 'var(--primary-color)';
-                dayElement.style.color = 'white';
-            } else {
-                dayElement.style.backgroundColor = 'var(--sidebar-bg)';
+            dayElement.className = 'day';
+            
+            if (i === currentDay) {
+                dayElement.style.backgroundColor = 'rgba(66, 133, 244, 0.1)';
             }
-
-            const dayName = currentDay.toLocaleDateString('es-ES', { weekday: 'short' });
-            const dayNumber = currentDay.getDate();
-            dayElement.innerHTML = `<div>${dayName}</div><div class="day-count">${dayNumber}</div>`;
-
-            const eventsOnDay = events.filter(event => 
-                event.dateTime.toDateString() === currentDay.toDateString()
-            );
-
-            if (eventsOnDay.length > 0) {
-                const eventCount = document.createElement('div');
-                eventCount.style.fontSize = '12px';
-                eventCount.style.marginTop = '5px';
-                eventCount.textContent = `${eventsOnDay.length} evento(s)`;
-                dayElement.appendChild(eventCount);
+            
+            const dateString = day.toISOString().split('T')[0];
+            const dayEvents = events.filter(event => event.date === dateString);
+            
+            dayElement.innerHTML = `
+                <div>${dayNames[i]}</div>
+                <div class="day-count">${day.getDate()}</div>
+                ${dayEvents.length > 0 ? `<div class="calendar-event-dot"></div>` : ''}
+            `;
+            
+            if (dayEvents.length > 0) {
+                dayElement.title = dayEvents.map(event => event.name).join('\n');
+                dayElement.style.cursor = 'pointer';
+                dayElement.addEventListener('click', () => {
+                    showDayEvents(dateString);
+                });
             }
+            
             weekCalendar.appendChild(dayElement);
         }
     }
 
-    // Funciones para categorías
-    function renderCategorySelect() {
-        const container = document.getElementById('category-select-container');
-        container.innerHTML = '';
-        categories.forEach(category => {
-            const option = document.createElement('div');
-            option.classList.add('category-option');
-            if (selectedCategoryId === category.id) {
-                option.classList.add('selected');
-            }
-            option.dataset.id = category.id;
-            option.innerHTML = `<span class="category-color" style="background-color: ${category.color};"></span>
-                                <i class="fas fa-${category.icon}"></i> ${category.name}`;
-            option.addEventListener('click', () => {
-                document.querySelectorAll('.category-option').forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                selectedCategoryId = category.id;
-            });
-            container.appendChild(option);
-        });
-    }
-
+    // Renderizar categorías
     function renderCategories() {
         const categoriesList = document.getElementById('categories-list');
         categoriesList.innerHTML = '';
 
         if (categories.length === 0) {
-            categoriesList.innerHTML = '<p>No hay categorías registradas.</p>';
+            categoriesList.innerHTML = '<p>No hay categorías creadas</p>';
             return;
         }
 
         categories.forEach(category => {
             const categoryCard = document.createElement('div');
-            categoryCard.classList.add('card', 'category-card');
+            categoryCard.className = 'category-card';
             categoryCard.innerHTML = `
-                <h3 style="color: ${category.color};"><i class="fas fa-${category.icon}"></i> ${category.name}</h3>
-                <p>${events.filter(e => e.categoryId === category.id).length} eventos</p>
-                <div class="event-actions">
-                    <button class="edit-category-btn" data-id="${category.id}" style="background-color: var(--warning-color); color: var(--dark-color);"><i class="fas fa-edit"></i></button>
-                    <button class="delete-category-btn" data-id="${category.id}" style="background-color: var(--danger-color); color: white;"><i class="fas fa-trash-alt"></i></button>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <span class="category-color" style="background-color: ${category.color}; width: 20px; height: 20px;"></span>
+                    <h3>${category.name}</h3>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span><i class="fas fa-${category.icon}"></i></span>
+                    <div>
+                        <button class="edit-btn" data-id="${category.id}" style="padding: 3px 6px; font-size: 12px;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" data-id="${category.id}" style="padding: 3px 6px; font-size: 12px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             `;
+
             categoriesList.appendChild(categoryCard);
         });
 
-        document.querySelectorAll('.delete-category-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const categoryId = parseInt(e.target.dataset.id);
+        // Agregar event listeners para los botones
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const categoryId = parseInt(this.getAttribute('data-id'));
                 deleteCategory(categoryId);
             });
         });
 
-        document.querySelectorAll('.edit-category-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const categoryId = parseInt(e.target.dataset.id);
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const categoryId = parseInt(this.getAttribute('data-id'));
                 editCategory(categoryId);
             });
         });
     }
 
-    function initCategoryModal() {
-        const modal = document.getElementById('category-modal');
-        const confirmBtn = document.getElementById('confirm-add-category');
-        const cancelBtn = document.getElementById('cancel-add-category');
-        const addCategoryBtn = document.getElementById('add-category');
-
-        addCategoryBtn.addEventListener('click', () => {
-            modal.style.display = 'flex';
-            document.getElementById('new-category-name').value = '';
-            document.getElementById('new-category-color').value = '#4285f4';
-            document.getElementById('new-category-icon').value = 'briefcase';
-            confirmBtn.dataset.mode = 'add'; // Set mode to 'add'
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-
-        confirmBtn.addEventListener('click', () => {
-            const name = document.getElementById('new-category-name').value;
-            const color = document.getElementById('new-category-color').value;
-            const icon = document.getElementById('new-category-icon').value;
-            const mode = confirmBtn.dataset.mode;
-            const categoryId = parseInt(confirmBtn.dataset.id);
-
-            if (!name) {
-                alert('El nombre de la categoría no puede estar vacío.');
-                return;
-            }
-
-            if (mode === 'add') {
-                const newId = categories.length > 0 ? Math.max(...categories.map(c => c.id)) + 1 : 1;
-                categories.push({ id: newId, name, color, icon });
-                addNotification('Nueva Categoría', `Se ha añadido la categoría "${name}".`, 'success');
-            } else if (mode === 'edit') {
-                const index = categories.findIndex(cat => cat.id === categoryId);
-                if (index !== -1) {
-                    categories[index] = { id: categoryId, name, color, icon };
-                    addNotification('Categoría Actualizada', `La categoría "${name}" ha sido actualizada.`, 'info');
-                }
-            }
-            saveCategories();
-            modal.style.display = 'none';
-        });
-    }
-
-    function deleteCategory(id) {
-        if (confirm('¿Estás seguro de que quieres eliminar esta categoría? Los eventos asociados no perderán su categoría pero esta no se mostrará correctamente.')) {
-            const categoryToDelete = categories.find(cat => cat.id === id);
-            categories = categories.filter(category => category.id !== id);
-            saveCategories();
-            renderCategorySelect(); // Refresh category list in event form
-            addNotification('Categoría Eliminada', `La categoría "${categoryToDelete.name}" ha sido eliminada.`, 'danger');
-        }
-    }
-
-    function editCategory(id) {
-        const categoryToEdit = categories.find(cat => cat.id === id);
-        if (!categoryToEdit) return;
-
-        document.getElementById('new-category-name').value = categoryToEdit.name;
-        document.getElementById('new-category-color').value = categoryToEdit.color;
-        document.getElementById('new-category-icon').value = categoryToEdit.icon;
+    // Eliminar categoría
+    function deleteCategory(categoryId) {
+        // Verificar si hay eventos usando esta categoría
+        const eventsUsingCategory = events.some(event => event.categoryId === categoryId);
         
-        const confirmBtn = document.getElementById('confirm-add-category');
-        confirmBtn.dataset.mode = 'edit';
-        confirmBtn.dataset.id = categoryToEdit.id;
-        confirmBtn.textContent = 'Actualizar';
-
-        document.getElementById('category-modal').style.display = 'flex';
-    }
-
-    // Funciones para notificaciones
-    function addNotification(title, message, type = 'info') { // type: 'info', 'success', 'warning', 'danger'
-        const newNotification = {
-            id: Date.now(),
-            title,
-            message,
-            type,
-            timestamp: new Date()
-        };
-        notifications.unshift(newNotification); // Add to the beginning
-        if (notifications.length > 20) { // Keep max 20 notifications
-            notifications.pop();
-        }
-        updateNotificationCount();
-        renderNotifications();
-        // Optionally, show a browser notification if enabled
-        if (settings.notificationsEnabled && Notification.permission === 'granted') {
-            new Notification(title, {
-                body: message,
-                icon: 'https://via.placeholder.com/50' // Placeholder icon
-            });
-        }
-    }
-
-    function renderNotifications() {
-        const notificationsList = document.getElementById('notifications-list');
-        notificationsList.innerHTML = '';
-        if (notifications.length === 0) {
-            notificationsList.innerHTML = '<p>No tienes notificaciones.</p>';
+        if (eventsUsingCategory) {
+            alert('No puedes eliminar esta categoría porque hay eventos asociados a ella.');
             return;
         }
 
-        notifications.forEach(notif => {
-            const notifItem = document.createElement('div');
-            notifItem.classList.add('notification-item');
-            notifItem.style.borderLeft = `3px solid var(--${notif.type}-color)`;
-            notifItem.innerHTML = `
-                <div>
-                    <h4>${notif.title}</h4>
-                    <p>${notif.message}</p>
-                    <small>${new Date(notif.timestamp).toLocaleString('es-ES')}</small>
-                </div>
-                <button class="delete-notification-btn" data-id="${notif.id}" style="background-color: var(--gray-color); color: white;">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            notificationsList.appendChild(notifItem);
-        });
-
-        document.querySelectorAll('.delete-notification-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const notifId = parseInt(e.target.dataset.id);
-                notifications = notifications.filter(notif => notif.id !== notifId);
-                renderNotifications();
-                updateNotificationCount();
-            });
-        });
-    }
-
-    // Funciones para configuración
-    function initSettings() {
-        document.getElementById('notifications-enabled').addEventListener('change', (e) => {
-            settings.notificationsEnabled = e.target.checked;
-            saveSettings();
-            if (e.target.checked) {
-                requestNotificationPermission();
-            }
-        });
-        document.getElementById('notification-sound').addEventListener('change', (e) => {
-            settings.notificationSound = e.target.checked;
-            saveSettings();
-        });
-        document.getElementById('alarms-enabled').addEventListener('change', (e) => {
-            settings.alarmsEnabled = e.target.checked;
-            saveSettings();
-            if (!settings.alarmsEnabled) {
-                // Clear any active alarms if disabled
-                if (alarmAudio) {
-                    alarmAudio.pause();
-                    alarmAudio.currentTime = 0;
-                    document.getElementById('alarm-overlay').style.display = 'none';
-                }
-            }
-            scheduleAllReminders(); // Re-evaluate reminders based on new setting
-        });
-        document.getElementById('alarm-volume').addEventListener('input', (e) => {
-            settings.alarmVolume = parseInt(e.target.value);
-            if (alarmAudio) {
-                alarmAudio.volume = settings.alarmVolume / 100;
-            }
-            saveSettings();
-        });
-        document.getElementById('dark-mode').addEventListener('change', (e) => {
-            settings.darkMode = e.target.checked;
-            applySettings();
-            saveSettings();
-        });
-
-        document.getElementById('save-settings').addEventListener('click', () => {
-            saveSettings();
-            alert('Configuración guardada!');
-        });
-    }
-
-    function saveSettings() {
-        localStorage.setItem('notec-settings', JSON.stringify(settings));
-    }
-
-    function requestNotificationPermission() {
-        if (!("Notification" in window)) {
-            console.log("Este navegador no soporta notificaciones de escritorio.");
-        } else if (Notification.permission === "granted") {
-            console.log("Permiso de notificación ya concedido.");
-        } else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    console.log("Permiso de notificación concedido.");
-                    addNotification('Permiso de Notificación', 'Las notificaciones del navegador están activadas.', 'success');
-                } else {
-                    console.log("Permiso de notificación denegado.");
-                    settings.notificationsEnabled = false;
-                    document.getElementById('notifications-enabled').checked = false;
-                    saveSettings();
-                }
-            });
+        if (confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
+            categories = categories.filter(category => category.id !== categoryId);
+            saveCategories();
         }
     }
 
+    // Editar categoría
+    function editCategory(categoryId) {
+        const category = categories.find(cat => cat.id === categoryId);
+        if (!category) return;
+
+        // Llenar el modal con los datos de la categoría
+        document.getElementById('new-category-name').value = category.name;
+        document.getElementById('new-category-color').value = category.color;
+        document.getElementById('new-category-icon').value = category.icon;
+
+        // Cambiar el texto del botón a "Actualizar"
+        const confirmButton = document.getElementById('confirm-add-category');
+        confirmButton.textContent = 'Actualizar';
+        
+        // Mostrar el modal
+        document.getElementById('category-modal').style.display = 'flex';
+
+        // Configurar el evento de confirmación para actualizar
+        const originalClickHandler = confirmButton.onclick;
+        confirmButton.onclick = function() {
+            const name = document.getElementById('new-category-name').value.trim();
+            const color = document.getElementById('new-category-color').value;
+            const icon = document.getElementById('new-category-icon').value;
+
+            if (!name) {
+                alert('Por favor ingresa un nombre para la categoría');
+                return;
+            }
+
+            // Actualizar la categoría
+            category.name = name;
+            category.color = color;
+            category.icon = icon;
+
+            saveCategories();
+
+            // Limpiar y cerrar modal
+            document.getElementById('new-category-name').value = '';
+            document.getElementById('category-modal').style.display = 'none';
+
+            // Restaurar el botón de confirmación
+            confirmButton.textContent = 'Guardar';
+            confirmButton.onclick = originalClickHandler;
+        };
+    }
+
+    // Inicializar configuración
+    function initSettings() {
+        document.getElementById('save-settings').addEventListener('click', saveSettings);
+    }
+
+    // Guardar configuración
+    function saveSettings() {
+        settings.notificationsEnabled = document.getElementById('notifications-enabled').checked;
+        settings.notificationSound = document.getElementById('notification-sound').checked;
+        settings.alarmsEnabled = document.getElementById('alarms-enabled').checked;
+        settings.alarmVolume = parseInt(document.getElementById('alarm-volume').value);
+        settings.darkMode = document.getElementById('dark-mode').checked;
+
+        localStorage.setItem('notec-settings', JSON.stringify(settings));
+        applySettings();
+
+        alert('Configuración guardada exitosamente');
+    }
+
+    // Programar recordatorios para todos los eventos
+    function scheduleAllReminders() {
+        // Limpiar todos los timeouts existentes
+        reminderTimeouts.forEach(timeout => clearTimeout(timeout));
+        reminderTimeouts = [];
+
+        if (!settings.alarmsEnabled) return;
+
+        const now = new Date();
+        
+        events.forEach(event => {
+            const eventDate = new Date(`${event.date}T${event.time}`);
+            
+            // Solo programar recordatorios para eventos futuros
+            if (eventDate > now) {
+                scheduleReminder(event);
+            }
+        });
+    }
+
+    // Programar un recordatorio para un evento
+    function scheduleReminder(event) {
+        if (!settings.alarmsEnabled) return;
+
+        const eventDate = new Date(`${event.date}T${event.time}`);
+        const now = new Date();
+        
+        // Calcular el tiempo para el recordatorio (en milisegundos)
+        const reminderTime = event.reminder * 60 * 1000; // Convertir minutos a milisegundos
+        const alarmTime = new Date(eventDate.getTime() - reminderTime);
+        
+        // Si el recordatorio ya pasó, no programarlo
+        if (alarmTime < now) return;
+        
+        const timeUntilAlarm = alarmTime - now;
+        
+        const timeoutId = setTimeout(() => {
+            triggerAlarm(event);
+        }, timeUntilAlarm);
+        
+        reminderTimeouts.push(timeoutId);
+    }
+
+    // Disparar una alarma
+    function triggerAlarm(event) {
+        if (!settings.alarmsEnabled) return;
+
+        // Mostrar el overlay de alarma
+        document.getElementById('alarm-title').textContent = `¡ALARMA: ${event.name}!`;
+        document.getElementById('alarm-message').textContent = `Es hora de tu evento: ${event.name}\n${formatDate(event.date)} a las ${event.time}`;
+        document.getElementById('alarm-overlay').style.display = 'flex';
+
+        // Reproducir sonido de alarma si está habilitado
+        if (settings.notificationSound && alarmAudio) {
+            alarmAudio.currentTime = 0;
+            alarmAudio.play().catch(error => {
+                console.log("Error al reproducir alarma:", error);
+            });
+        }
+
+        // Crear notificación
+        createNotification({
+            title: `Recordatorio: ${event.name}`,
+            message: `Es hora de tu evento programado para ${event.time}`,
+            type: 'alarm',
+            timestamp: new Date().toISOString()
+        });
+    }
+
+    // Crear una notificación
+    function createNotification(notification) {
+        if (!settings.notificationsEnabled) return;
+
+        notifications.unshift(notification);
+        renderNotifications();
+        updateNotificationCount();
+
+        // Guardar notificaciones en localStorage
+        localStorage.setItem('notec-notifications', JSON.stringify(notifications));
+    }
+
+    // Renderizar notificaciones
+    function renderNotifications() {
+        const notificationsList = document.getElementById('notifications-list');
+        notificationsList.innerHTML = '';
+
+        if (notifications.length === 0) {
+            notificationsList.innerHTML = '<p>No hay notificaciones</p>';
+            return;
+        }
+
+        notifications.forEach(notification => {
+            const notificationItem = document.createElement('div');
+            notificationItem.className = 'notification-item';
+            
+            const icon = notification.type === 'alarm' ? 'fa-bell' : 'fa-info-circle';
+            const timeAgo = getTimeAgo(notification.timestamp);
+            
+            notificationItem.innerHTML = `
+                <div>
+                    <i class="fas ${icon}"></i>
+                    <strong>${notification.title}</strong>
+                    <p>${notification.message}</p>
+                    <small>${timeAgo}</small>
+                </div>
+                <button class="delete-btn" data-id="${notification.timestamp}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            notificationsList.appendChild(notificationItem);
+        });
+
+        // Agregar event listeners para los botones de eliminar
+        document.querySelectorAll('.notification-item .delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const timestamp = this.getAttribute('data-id');
+                deleteNotification(timestamp);
+            });
+        });
+    }
+
+    // Eliminar notificación
+    function deleteNotification(timestamp) {
+        notifications = notifications.filter(n => n.timestamp !== timestamp);
+        localStorage.setItem('notec-notifications', JSON.stringify(notifications));
+        renderNotifications();
+        updateNotificationCount();
+    }
+
+    // Obtener "hace cuánto tiempo" en formato legible
+    function getTimeAgo(timestamp) {
+        const now = new Date();
+        const past = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - past) / 1000);
+        
+        if (diffInSeconds < 60) {
+            return `Hace ${diffInSeconds} segundos`;
+        }
+        
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) {
+            return `Hace ${diffInMinutes} ${diffInMinutes === 1 ? 'minuto' : 'minutos'}`;
+        }
+        
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) {
+            return `Hace ${diffInHours} ${diffInHours === 1 ? 'hora' : 'horas'}`;
+        }
+        
+        const diffInDays = Math.floor(diffInHours / 24);
+        return `Hace ${diffInDays} ${diffInDays === 1 ? 'día' : 'días'}`;
+    }
+
+    // Verificar eventos próximos (se ejecuta cada minuto)
+    function checkForUpcomingEvents() {
+        if (!settings.notificationsEnabled) return;
+
+        const now = new Date();
+        const in15Minutes = new Date(now.getTime() + 15 * 60 * 1000);
+        
+        events.forEach(event => {
+            const eventDate = new Date(`${event.date}T${event.time}`);
+            
+            // Verificar si el evento está dentro de los próximos 15 minutos
+            if (eventDate > now && eventDate <= in15Minutes) {
+                // Verificar si ya hemos notificado sobre este evento
+                const alreadyNotified = notifications.some(n => 
+                    n.title.includes(event.name) && 
+                    new Date(n.timestamp) > new Date(now.getTime() - 15 * 60 * 1000)
+                );
+                
+                if (!alreadyNotified) {
+                    createNotification({
+                        title: `Evento próximo: ${event.name}`,
+                        message: `Tu evento "${event.name}" comienza a las ${event.time}`,
+                        type: 'reminder',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            }
+        });
+    }
+
+    // Actualizar contador de eventos
+    function updateEventCount() {
+        document.getElementById('total-events').textContent = events.length;
+    }
+
+    // Actualizar contador de notificaciones
+    function updateNotificationCount() {
+        document.getElementById('total-notifications').textContent = notifications.length;
+    }
 </script>
 </body>
 </html>
